@@ -18,7 +18,7 @@ const AnimatedPointer: React.FC = (props: AnimatedPointerProps) => {
 
   const appendRipple = (x: number, y: number) => {
     // To remove existing ripple element from dom.
-    removeRipple();
+    removeRipple("ripplespan-01");
     const span = document.createElement("span");
     span.setAttribute("id", "ripplespan-01");
 
@@ -34,8 +34,20 @@ const AnimatedPointer: React.FC = (props: AnimatedPointerProps) => {
     document.body.appendChild(span);
   };
 
-  const removeRipple = () => {
-    const span = document.getElementById("ripplespan-01");
+  const appendStaticPointer = (x: number, y: number) => {
+    const span = document.getElementById("staticspan-01");
+
+    if (span) {
+      span.classList.add("staticspan");
+      span.style.top = y - 50 / 2 + "px"; //center point
+      span.style.left = x - 50 / 2 + "px"; //center point
+      span.style.width = 50 + "px";
+      span.style.height = 50 + "px";
+    }
+  };
+
+  const removeRipple = (id: string) => {
+    const span = document.getElementById(id);
     if (span) {
       span.parentNode?.removeChild(span);
     }
@@ -53,23 +65,30 @@ const AnimatedPointer: React.FC = (props: AnimatedPointerProps) => {
     }
   };
 
-//   const onTouchEnd = (e: any) => { // TODO 
-//     if ("ontouchstart" in document.documentElement) {
-//       const totalTouches = e.touches.length;
-//       if (totalTouches > 0) {
-//         const newTouch = e.touches[totalTouches - 1];
-//         const x = newTouch.clientX;
-//         const y = newTouch.clientY;
-//       }
-//     }
-//   };
+  const onDragOver = (e: React.MouseEvent) => {
+    e.preventDefault();
+    onMouseMove(e);
+    appendStaticPointer(pX, pY);
+  };
+
+  const onDragEnd = (e: React.MouseEvent) => {
+    removeRipple("staticspan-01");
+  };
+  const onDragStart = (e: React.MouseEvent) => {
+    const span = document.createElement("span");
+    span.setAttribute("id", "staticspan-01");
+    document.body.appendChild(span);
+  };
 
   return (
     <div
       onClick={mouseClicked}
       onMouseMove={onMouseMove}
-    //   onTouchEnd={onTouchEnd}
       onTouchStart={onTouchStart}
+      draggable
+      onDragOver={onDragOver}
+      onDragStart={onDragStart}
+      onDragEnd={onDragEnd}
     >
       {props.children}
     </div>
